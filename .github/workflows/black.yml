@@ -1,0 +1,12 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: psf/black@26.1.0
+        with:
+          options: "--check --verbose"
