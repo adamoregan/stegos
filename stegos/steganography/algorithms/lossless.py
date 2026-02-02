@@ -56,7 +56,7 @@ class LosslessSteganographyStrategy(SeededSteganographyStrategy):
         payload_indices = random_indices[len(size_bits) :]
 
         bits_written = 0
-        for bit_pos in range(self.lsb_depth):
+        for bit_index in range(self.lsb_depth):
             if bits_written >= len(payload_bits):
                 break
 
@@ -67,7 +67,7 @@ class LosslessSteganographyStrategy(SeededSteganographyStrategy):
             pixels[write_indices] = bitops.embed_bits_in_bytes(
                 pixels[write_indices],
                 payload_bits[bits_written : bits_written + bits_to_write],
-                bit_pos,
+                bit_index,
             )
 
             bits_written += bits_to_write
@@ -89,7 +89,7 @@ class LosslessSteganographyStrategy(SeededSteganographyStrategy):
         payload_bits = np.empty(payload_size, dtype=np.uint8)
 
         bits_read = 0
-        for bit_pos in range(self.lsb_depth):
+        for bit_index in range(self.lsb_depth):
             if bits_read >= payload_size:
                 break
 
@@ -97,7 +97,7 @@ class LosslessSteganographyStrategy(SeededSteganographyStrategy):
             bits_to_read = min(len(payload_indices), remaining)
 
             read_indices = payload_indices[:bits_to_read]
-            bits = bitops.get_bit(pixels[read_indices], bit_pos)
+            bits = bitops.get_bit(pixels[read_indices], bit_index)
 
             payload_bits[bits_read : bits_read + bits_to_read] = bits
             bits_read += bits_to_read
