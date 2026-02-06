@@ -18,7 +18,7 @@ class TestBitops:
         ],
     )
     def test_bytes_to_bits(self, bytes_to_convert: bytes, expected_bits: np.ndarray):
-        """Bytes should be convertible to a NumPy bit array."""
+        """Bytes should be convertible to a NumPy bit stego_image."""
         assert np.array_equal(bitops.bytes_to_bits(bytes_to_convert), expected_bits)
 
     @pytest.mark.parametrize(
@@ -32,7 +32,7 @@ class TestBitops:
         ],
     )
     def test_bits_to_bytes(self, bits_to_convert: np.ndarray, expected_bytes: bytes):
-        """NumPy bit array should be convertible to bytes."""
+        """NumPy bit stego_image should be convertible to bytes."""
         assert bitops.bits_to_bytes(bits_to_convert) == expected_bytes
 
     @pytest.mark.parametrize(
@@ -60,10 +60,10 @@ class TestBitops:
         ],
     )
     def test_get_bit(
-        self, byte_array: np.ndarray, bit_pos: int, expected_bits: np.ndarray
+        self, byte_array: np.ndarray, bit_index: int, expected_bits: np.ndarray
     ):
-        """The nth bits should be extractable from a NumPy byte array."""
-        assert np.array_equal(bitops.get_bit(byte_array, bit_pos), expected_bits)
+        """The nth bits should be extractable from a NumPy byte stego_image."""
+        assert np.array_equal(bitops.get_bit(byte_array, bit_index), expected_bits)
 
     @pytest.mark.parametrize(
         ("byte_array", "bit_array", "bit_index", "expected_bytes"),
@@ -98,10 +98,10 @@ class TestBitops:
         self,
         byte_array: np.ndarray,
         bit_array: np.ndarray,
-        bit_pos: int,
+        bit_index: int,
         expected_bytes: np.ndarray,
     ):
-        """Bits should be embedded in the nth position of a NumPy byte array."""
+        """Bits should be embedded in the nth position of a NumPy byte stego_image."""
         assert np.array_equal(
-            bitops.embed_bits_in_bytes(byte_array, bit_array, bit_pos), expected_bytes
+            bitops.embed_bits_in_bytes(byte_array, bit_array, bit_index), expected_bytes
         )

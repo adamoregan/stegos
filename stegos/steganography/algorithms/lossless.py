@@ -78,7 +78,6 @@ class LosslessSteganographyStrategy(SeededSteganographyStrategy):
         pixels: np.ndarray = stego_image.ravel()
         random_indices = self._random_indices(pixels)
 
-        # Extract payload size
         payload_size_bits = self.PAYLOAD_SIZE_BYTES * 8
         size_bits = bitops.get_bit(
             pixels[random_indices[:payload_size_bits]], bit_index=0

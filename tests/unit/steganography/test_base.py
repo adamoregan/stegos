@@ -5,7 +5,7 @@ from stegos.steganography.base import (
     ImageSteganographyContext,
 )
 from stegos.steganography.exception import InsufficientCapacityException
-from tests.unit.steganography.util import create_image
+from tests.util import create_image
 
 
 class DummyStrategy(ImageSteganographyStrategy):
