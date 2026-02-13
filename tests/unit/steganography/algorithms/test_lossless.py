@@ -43,7 +43,7 @@ class TestLosslessSteganographyStrategy:
 
     def test_embed_randomisation(self, steg):
         """Embedding should be seed-independent. The payload should only be recoverable with the correct seed."""
-        cover_image, payload = create_image(), b"x"
+        cover_image, payload = create_image(), b"Embedded Payload"
         stego_image = steg.embed(cover_image, payload)
         assert (
             LosslessSteganographyStrategy(seed=steg.seed + 1).extract(stego_image)

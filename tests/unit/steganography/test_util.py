@@ -10,10 +10,10 @@ class TestBitops:
     @pytest.mark.parametrize(
         ("bytes_to_convert", "expected_bits"),
         [
-            (b"\xff\xff\xff\xff", np.ones(32, dtype=np.uint8)),
-            (b"\x00\x00\x00\x00", np.zeros(32, dtype=np.uint8)),
-            (b"\x80\x00\x00\x00", np.array([1] + [0] * 31, dtype=np.uint8)),
-            (b"\xff", np.ones(8, dtype=np.uint8)),
+            (b"\xff\xff\xff\xff", np.ones(32)),
+            (b"\x00\x00\x00\x00", np.zeros(32)),
+            (b"\x80\x00\x00\x00", np.array([1] + [0] * 31)),
+            (b"\xff", np.ones(8)),
             (b"", np.empty(0)),
         ],
     )
@@ -24,10 +24,10 @@ class TestBitops:
     @pytest.mark.parametrize(
         ("bits_to_convert", "expected_bytes"),
         [
-            (np.ones(32, dtype=np.uint8), b"\xff\xff\xff\xff"),
-            (np.zeros(32, dtype=np.uint8), b"\x00\x00\x00\x00"),
-            (np.array([1] + [0] * 31, dtype=np.uint8), b"\x80\x00\x00\x00"),
-            (np.ones(8, dtype=np.uint8), b"\xff"),
+            (np.ones(32, dtype=np.bool), b"\xff\xff\xff\xff"),
+            (np.zeros(32, dtype=np.bool), b"\x00\x00\x00\x00"),
+            (np.array([1] + [0] * 31, dtype=np.bool), b"\x80\x00\x00\x00"),
+            (np.ones(8, dtype=np.bool), b"\xff"),
             (np.empty(0), b""),
         ],
     )
@@ -53,10 +53,10 @@ class TestBitops:
     @pytest.mark.parametrize(
         ("byte_array", "bit_index", "expected_bits"),
         [
-            (np.array([0xFF, 0xFF, 0xFF], dtype=np.uint8), 0, np.array([1, 1, 1])),
-            (np.array([0xFE, 0xFF, 0xFE], dtype=np.uint8), 0, np.array([0, 1, 0])),
-            (np.array([0xFC, 0xFC, 0xFE], dtype=np.uint8), 1, np.array([0, 0, 1])),
-            (np.array([0x3F, 0xFF], dtype=np.uint8), 7, np.array([0, 1])),
+            (np.array([0xFF, 0xFF, 0xFF]), 0, np.array([1, 1, 1])),
+            (np.array([0xFE, 0xFF, 0xFE]), 0, np.array([0, 1, 0])),
+            (np.array([0xFC, 0xFC, 0xFE]), 1, np.array([0, 0, 1])),
+            (np.array([0x3F, 0xFF]), 7, np.array([0, 1])),
         ],
     )
     def test_get_bit(
@@ -69,28 +69,28 @@ class TestBitops:
         ("byte_array", "bit_array", "bit_index", "expected_bytes"),
         [
             (
-                np.array([0xFF, 0xFF, 0xFF], dtype=np.uint8),
-                np.array([0, 1, 0], dtype=np.uint8),
+                np.array([0xFF, 0xFF, 0xFF]),
+                np.array([0, 1, 0]),
                 0,
-                np.array([0xFE, 0xFF, 0xFE], dtype=np.uint8),
+                np.array([0xFE, 0xFF, 0xFE]),
             ),
             (
-                np.array([0xFE, 0xFF, 0xFE], dtype=np.uint8),
-                np.array([1, 0, 1], dtype=np.uint8),
+                np.array([0xFE, 0xFF, 0xFE]),
+                np.array([1, 0, 1]),
                 0,
-                np.array([0xFF, 0xFE, 0xFF], dtype=np.uint8),
+                np.array([0xFF, 0xFE, 0xFF]),
             ),
             (
-                np.array([0xFF, 0xFF, 0xFF], dtype=np.uint8),
-                np.array([0, 0, 1], dtype=np.uint8),
+                np.array([0xFF, 0xFF, 0xFF]),
+                np.array([0, 0, 1]),
                 1,
-                np.array([0xFD, 0xFD, 0xFF], dtype=np.uint8),
+                np.array([0xFD, 0xFD, 0xFF]),
             ),
             (
-                np.array([0x00, 0xFF], dtype=np.uint8),
-                np.array([1, 0], dtype=np.uint8),
+                np.array([0x00, 0xFF]),
+                np.array([1, 0]),
                 7,
-                np.array([0x80, 0x7F], dtype=np.uint8),
+                np.array([0x80, 0x7F]),
             ),
         ],
     )

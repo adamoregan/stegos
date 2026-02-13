@@ -75,4 +75,4 @@ def embed_bits_in_bytes(
     :return: NumPy array of bytes with the embedded bits.
     """
     byte_array = clear_bit(byte_array, bit_index)
-    return byte_array | np.uint8(bit_array << bit_index)
+    return byte_array | bit_array << bit_index
