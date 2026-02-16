@@ -9,14 +9,19 @@ from tests.util import create_image
 
 
 class DummyStrategy(ImageSteganographyStrategy):
+    def __init__(self):
+        super().__init__()
+        self._payload = None
+
     def payload_capacity(self, cover_image):
         return 10000
 
     def embed(self, cover_image, payload):
+        self._payload = payload
         return cover_image
 
     def extract(self, stego_image):
-        return b""
+        return self._payload
 
 
 @pytest.fixture

@@ -8,7 +8,7 @@ from stegos.steganography.base import SeededSteganographyStrategy
 
 
 class LosslessSteganographyStrategy(SeededSteganographyStrategy):
-    """Class defining a lossless steganography algorithm that embeds directly in an image's pixels.
+    """Defines a lossless steganography algorithm that embeds directly in an image's pixels.
 
     This algorithm should only be used for lossless file formats. Otherwise, the embedded data may be lost during lossy compression.
     """

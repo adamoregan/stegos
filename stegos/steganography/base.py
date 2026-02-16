@@ -12,6 +12,8 @@ class ImageSteganographyStrategy(ABC):
         Creates an instance of the ImageSteganographyStrategy class.
         :param lsb_depth: The least significant bit embedding depth of the algorithm.
         """
+        if not isinstance(lsb_depth, int):
+            raise TypeError(f"lsb_depth must be an int, not {type(lsb_depth).__name__}")
         if not (1 <= lsb_depth <= 7):
             raise ValueError(f"invalid lsb_depth (expected 1 to 7, got {lsb_depth})")
         self._lsb_depth = lsb_depth
@@ -63,6 +65,8 @@ class SeededSteganographyStrategy(ImageSteganographyStrategy, ABC):
         :param lsb_depth: The least significant bit embedding depth of the algorithm.
         """
         super().__init__(lsb_depth)
+        if not isinstance(seed, int):
+            raise TypeError(f"seed must be an int, not {type(seed).__name__}")
         self._seed = seed
 
     @property
@@ -74,7 +78,7 @@ class SeededSteganographyStrategy(ImageSteganographyStrategy, ABC):
         return self._seed
 
 
-class ImageSteganographyContext(ABC):
+class ImageSteganographyContext:
     """Context class for image steganography."""
 
     def __init__(self, strategy: ImageSteganographyStrategy):
