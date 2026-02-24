@@ -2,13 +2,12 @@ import pytest
 from cryptography.fernet import Fernet, InvalidToken
 
 from stegos.steganography.decorators.encryption import EncryptionDecorator
-from tests.unit.steganography.test_base import DummyStrategy
-from tests.util import create_image
+from tests.unit.steganography.util import create_image, Dummy
 
 
 @pytest.fixture
 def steg():
-    return EncryptionDecorator(DummyStrategy(), Fernet.generate_key())
+    return EncryptionDecorator(Dummy(), Fernet.generate_key())
 
 
 class TestEncryptionDecorator:

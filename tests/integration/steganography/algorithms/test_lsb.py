@@ -4,15 +4,15 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from stegos.steganography.algorithms.lossless import LosslessSteganographyStrategy
-from tests.util import create_image
+from stegos.steganography.algorithms.lsb import LSBSteganography
+from tests.unit.steganography.util import create_image
 
 
 def lossless_compression(stego_image: np.ndarray) -> np.ndarray:
     """
     Simulates lossless compression.
-    :param stego_image: The stego image to perform lossless compression on.
-    :return: The stego image after lossless compression.
+    :param stego_image: Stego image to perform lossless compression on.
+    :return: Stego image after lossless compression.
     """
     buf = BytesIO()
     Image.fromarray(stego_image).save(buf, format="PNG")
@@ -21,11 +21,11 @@ def lossless_compression(stego_image: np.ndarray) -> np.ndarray:
 
 @pytest.fixture()
 def steg():
-    return LosslessSteganographyStrategy(seed=1)
+    return LSBSteganography(seed=1)
 
 
-class TestLosslessSteganographyStrategy:
-    """Integration tests for LosslessSteganographyStrategy."""
+class TestLSBSteganography:
+    """Integration tests for LSBSteganography."""
 
     @pytest.mark.parametrize(
         "payload",

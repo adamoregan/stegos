@@ -53,26 +53,45 @@ def get_bit(byte_array: np.ndarray, bit_index: int = 0) -> np.ndarray:
     return (byte_array >> bit_index) & 1
 
 
-def clear_bit(byte_array: np.ndarray, bit_index: int) -> np.ndarray:
+def clear_bit(carrier_array: np.ndarray, bit_index: int) -> np.ndarray:
     """
     Clear bit values of a NumPy array.
-    :param byte_array: NumPy array of bytes.
+    :param carrier_array: NumPy array of bytes.
     :param bit_index: The index of the bits to clear.
     :return: NumPy array of bytes with the cleared bits.
     """
-    mask = np.uint8(1 << bit_index)
-    return byte_array & ~mask
+    mask = np.array(1 << bit_index, dtype=carrier_array.dtype)
+    return carrier_array & ~mask
 
 
-def embed_bits_in_bytes(
-    byte_array: np.ndarray, bit_array: np.ndarray, bit_index: int
+def embed_bits(
+    carrier_array: np.ndarray, bit_array: np.ndarray, bit_index: int
 ) -> np.ndarray:
     """
     Embed bits in a NumPy array.
-    :param byte_array: NumPy array of bytes to embed bits in.
+    :param carrier_array: NumPy integer array to embed bits in.
     :param bit_array: NumPy array of bits to embed.
     :param bit_index: The index of the bits to replace.
-    :return: NumPy array of bytes with the embedded bits.
+    :return: NumPy array of integers with the embedded bits.
     """
-    byte_array = clear_bit(byte_array, bit_index)
-    return byte_array | bit_array << bit_index
+    carrier_array = clear_bit(carrier_array, bit_index)
+    return carrier_array | bit_array << bit_index
+
+
+def has_msb_set(bits: np.ndarray, lsb_depth: int) -> np.ndarray:
+    """
+    Checks if bits are set.
+    :param bits: Bits to check.
+    :param lsb_depth: Number of LSBs to ignore.
+    :return: NumPy array of booleans indicating where the MSBs are set.
+    """
+    return np.any(bits[:, :-lsb_depth] == 1, axis=1)
+
+
+def int32_to_bits(nums: np.ndarray) -> np.ndarray:
+    """
+    Converts int32 integers to their bit representations.
+    :param nums: Integers to convert.
+    :return: NumPy array of bits representing the integers.
+    """
+    return np.unpackbits(nums.astype(">i4").view(np.uint8)).reshape(-1, 32)

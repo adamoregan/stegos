@@ -18,12 +18,7 @@ class InsufficientCapacityException(Exception):
         super().__init__(message)
 
 
-class UnsupportedColorSpaceError(Exception):
-    """Exception raised when the image color space is not supported."""
+class InvalidCoverImageException(Exception):
+    """Exception raised when a cover image can not be used as a carrier for a payload."""
 
-    def __init__(self, message: str = "unsupported color space"):
-        """
-        Creates an instance of the UnsupportedColorSpaceError class.
-        :param message: The default error message.
-        """
-        super().__init__(message)
+    pass

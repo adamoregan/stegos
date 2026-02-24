@@ -1,10 +1,10 @@
 import numpy as np
 from cryptography.fernet import Fernet
 
-from stegos.steganography.decorators.decorator import ImageSteganographyDecorator
+from stegos.steganography.decorators.decorator import BaseLSBSteganographyDecorator
 
 
-class EncryptionDecorator(ImageSteganographyDecorator):
+class EncryptionDecorator(BaseLSBSteganographyDecorator):
     """Encrypts the payload before embedding."""
 
     def __init__(self, strategy, key: bytes):

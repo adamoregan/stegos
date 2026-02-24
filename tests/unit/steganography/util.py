@@ -1,5 +1,20 @@
 import numpy as np
 
+from stegos.steganography.base import BaseLSBSteganography
+
+
+class Dummy(BaseLSBSteganography):
+    def __init__(self, lsb_depth: int = 2):
+        super().__init__(lsb_depth)
+        self._payload = None
+
+    def embed(self, cover_image, payload):
+        self._payload = payload
+        return cover_image
+
+    def extract(self, stego_image):
+        return self._payload
+
 
 def create_image(width=8, height=8, mode="RGB") -> np.ndarray:
     """
