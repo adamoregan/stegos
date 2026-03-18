@@ -2,7 +2,7 @@ import pytest
 from cryptography.fernet import InvalidToken
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 
-from stegos.core.steganography import EncryptionDecorator
+from stegos.core.steganography.decorators.encryption import EncryptionDecorator
 from tests.unit.steganography.util import create_image, Dummy
 
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from stegos.core.steganography import BaseLSBSteganography
+from stegos.core.steganography.base import BaseLSBSteganography
 
 
 class Dummy(BaseLSBSteganography):

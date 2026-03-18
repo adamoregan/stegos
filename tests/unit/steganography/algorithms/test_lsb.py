@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from stegos.core.steganography import LSBSteganography
-from stegos.core.steganography import (
+from stegos.core.steganography.algorithms.lsb import LSBSteganography
+from stegos.core.steganography.exception import (
     InsufficientCapacityException,
     InvalidCoverImageException,
 )
