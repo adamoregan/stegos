@@ -1,6 +1,6 @@
 import numpy as np
 
-from stegos.steganography.base import BaseLSBSteganography
+from stegos.core.steganography.base import BaseLSBSteganography
 
 
 class BaseLSBSteganographyDecorator(BaseLSBSteganography):

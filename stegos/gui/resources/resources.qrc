@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>templates/help.html</file>
+    <file>templates/about.html</file>
+    <file>stylesheets/base.qss</file>
+    <file>stylesheets/dark.qss</file>
+    <file>stylesheets/light.qss</file>
+    <file>app.png</file>
+</qresource>
+</RCC>

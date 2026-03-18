@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from stegos.steganography.algorithms.lsb import LSBSteganography
+from stegos.core.steganography import LSBSteganography
 from tests.unit.steganography.util import create_image
 
 

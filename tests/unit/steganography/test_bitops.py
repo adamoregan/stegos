@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from stegos.steganography import bitops
+from stegos.core.steganography import bitops
 
 
 class TestBitops:

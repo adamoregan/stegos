@@ -1,4 +1,4 @@
-from stegos.cryptography.dh.x25519 import X25519
+from stegos.core.cryptography.dh.x25519 import X25519
 
 
 class TestX25519:

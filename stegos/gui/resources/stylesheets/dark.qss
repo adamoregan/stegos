@@ -1,0 +1,3 @@
+QLabel[class~=error] {
+    color: #ff4c4c;
+}

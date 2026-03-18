@@ -1,8 +1,7 @@
-from stegos.steganography import bitops
-
 import numpy as np
 
-from stegos.steganography.algorithms.lsb import LSBSteganography
+from stegos.core.steganography import bitops
+from stegos.core.steganography.algorithms.lsb import LSBSteganography
 
 
 class LossyLSBSteganography(LSBSteganography):

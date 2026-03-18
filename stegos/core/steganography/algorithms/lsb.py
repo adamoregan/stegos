@@ -1,12 +1,11 @@
-from stegos.steganography import bitops
-from stegos.steganography.exception import (
+import numpy as np
+
+from stegos.core.steganography import bitops
+from stegos.core.steganography.exception import (
     InsufficientCapacityException,
     InvalidCoverImageException,
 )
-
-import numpy as np
-
-from stegos.steganography.base import SeededSteganography
+from stegos.core.steganography.base import SeededSteganography
 
 
 class LSBSteganography(SeededSteganography):

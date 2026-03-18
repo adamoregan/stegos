@@ -21,3 +21,8 @@ class BaseDH(ABC):
         :return: Public key used to derive a shared secret.
         """
         pass
+
+    @abstractmethod
+    def rotate(self) -> None:
+        """Rotates the private key."""
+        pass

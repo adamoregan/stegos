@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import (
     X25519PrivateKey,
 )
 
-from stegos.cryptography.dh.base import BaseDH
+from stegos.core.cryptography.dh.base import BaseDH
 
 
 class X25519(BaseDH):
@@ -18,9 +18,12 @@ class X25519(BaseDH):
     def public_key(self) -> bytes:
         return self._private_key.public_key().public_bytes_raw()
 
+    def rotate(self) -> None:
+        self._private_key = X25519PrivateKey.generate()  # provides forward-secrecy
+
     def exchange(self, peer_public_key: bytes) -> bytes:
         shared_key = self._private_key.exchange(
             X25519PublicKey.from_public_bytes(peer_public_key)
         )
-        self._private_key = X25519PrivateKey.generate()  # provides forward-secrecy
+        self.rotate()
         return shared_key

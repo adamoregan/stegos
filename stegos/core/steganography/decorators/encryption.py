@@ -7,7 +7,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf import KeyDerivationFunction
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 
-from stegos.steganography.decorators.decorator import BaseLSBSteganographyDecorator
+from stegos.core.steganography.decorators.decorator import BaseLSBSteganographyDecorator
 
 
 def _default_argon2(salt: bytes) -> Argon2id:
