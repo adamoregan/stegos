@@ -80,7 +80,7 @@ class LSBSteganography(SeededSteganography):
             if bits_read >= payload_size:
                 break
 
-            remaining = payload_size - bits_read
+            remaining = len(payload) - bits_read
             bits_to_read = min(pixels.size, remaining)
 
             read_indices = random_indices[:bits_to_read]

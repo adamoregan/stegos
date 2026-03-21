@@ -1,0 +1,5 @@
+jpegio==0.2.8
+numpy==2.4.3
+Pillow==12.1.1
+PySide6==6.10.2
+pytest==9.0.2

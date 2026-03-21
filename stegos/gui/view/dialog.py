@@ -10,9 +10,12 @@ from PySide6.QtWidgets import (
     QPushButton,
     QToolTip,
     QTextBrowser,
+    QMessageBox,
+    QProgressDialog,
 )
 
 from stegos.gui.constants import Templates, Links
+from stegos.gui.model.concurrency import Worker
 from stegos.gui.model.dh import DHModel
 from stegos.gui.util import read_resource
 from stegos.gui.view.button import IconButton
@@ -177,3 +180,57 @@ class DHKEDialog(QDialog):
         """Copies the public key to the clipboard."""
         QApplication.clipboard().setText(self.key_output.toPlainText())
         QToolTip.showText(QCursor.pos(), "Copied to Clipboard")
+
+
+class ProgressDialog(QProgressDialog):
+    """Progress dialog tied to the lifecycle of a worker."""
+
+    def __init__(
+        self,
+        worker: Worker,
+        title: str = "Loading",
+        labelText: str = "Loading...",
+        parent=None,
+    ):
+        """
+        Creates an instance of ProgressDialog.
+        :param worker: Worker that the dialog is tied to.
+        :param title: Title of the dialog window.
+        :param labelText: Text of the primary label.
+        :param parent: Parent of the dialog.
+        """
+        super().__init__(labelText, None, 0, 0, parent)
+        self._worker = worker
+
+        self.setWindowTitle(title)
+        self.setMinimumSize(250, 100)
+
+        self.worker.signals.started.connect(self.show)
+        self.worker.signals.finished.connect(self.close)
+
+    @property
+    def worker(self) -> Worker:
+        """Gets the worker that the dialog is tied to."""
+        return self._worker
+
+
+class OverwriteMessageBox(QMessageBox):
+    """Message box prompting the user to confirm if they want to overwrite an existing file."""
+
+    def __init__(self, file: str, parent=None):
+        """
+        Creates an instance of OverwriteMessageBox.
+        :param file: Existing file to overwrite.
+        :param parent: Parent of the message box.
+        """
+        super().__init__(
+            QMessageBox.Icon.Warning,
+            "Overwrite File?",
+            f"File '{file}' already exists.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            parent,
+            informativeText="Do you want to overwrite it?",
+        )
+        self.setDefaultButton(
+            QMessageBox.StandardButton.No
+        )  # helps avoid accidental overwrites

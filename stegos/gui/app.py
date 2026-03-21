@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from stegos.core.cryptography.dh.x25519 import X25519
+from stegos.core.service import LSBSteganographyService
 from stegos.gui.constants import Stylesheets
 from stegos.gui.model.dh import DHModel
 from stegos.gui.util import read_resource
@@ -39,6 +40,7 @@ class MainWindow(QMainWindow):
 
         self.dh_model = DHModel(X25519())
         self.setMenuBar(AppMenuBar(self, self.dh_model))
+        self.service = LSBSteganographyService()
 
         self._create_ui()
         self._connect_signals()
@@ -62,8 +64,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.form_stack = QStackedWidget()
-        self.extraction_form = ExtractionForm()
-        self.embedding_form = EmbeddingForm()
+        self.extraction_form = ExtractionForm(self.service)
+        self.embedding_form = EmbeddingForm(self.service)
 
         self.form_stack.addWidget(self.embedding_form)
         self.form_stack.addWidget(self.extraction_form)
