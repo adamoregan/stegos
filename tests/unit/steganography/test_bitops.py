@@ -112,3 +112,18 @@ class TestBitops:
         assert np.array_equal(
             bitops.embed_bits(carrier_array, bit_array, bit_index), expected_bytes
         )
+
+    @pytest.mark.parametrize(
+        ("test_array", "lsb_depth", "expected_results"),
+        [
+            (np.array([1, -1, 0]), 1, np.array([False, True, False])),
+            (np.array([2, 3, 4]), 2, np.array([False, False, True])),
+            (np.array([8, 7]), 3, np.array([True, False])),
+            (np.array([-1, 128, 127]), 7, np.array([True, True, False])),
+        ],
+    )
+    def test_has_msbs_set(self, test_array, lsb_depth, expected_results):
+        """Numpy Integer array with MSBs set after a given LSB depth should be identifiable."""
+        assert np.array_equal(
+            bitops.has_msbs_set(test_array, lsb_depth), expected_results
+        )

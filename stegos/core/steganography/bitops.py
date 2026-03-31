@@ -75,23 +75,14 @@ def embed_bits(
     :return: NumPy array of integers with the embedded bits.
     """
     carrier_array = clear_bit(carrier_array, bit_index)
-    return carrier_array | bit_array << bit_index
+    return carrier_array | (bit_array << bit_index)
 
 
-def has_msb_set(bits: np.ndarray, lsb_depth: int) -> np.ndarray:
+def has_msbs_set(nums: np.ndarray, lsb_depth: int) -> np.ndarray:
     """
-    Checks if bits are set.
-    :param bits: Bits to check.
+    Checks if MSBs are set.
+    :param nums: Integers to check.
     :param lsb_depth: Number of LSBs to ignore.
     :return: NumPy array of booleans indicating where the MSBs are set.
     """
-    return np.any(bits[:, :-lsb_depth] == 1, axis=1)
-
-
-def int32_to_bits(nums: np.ndarray) -> np.ndarray:
-    """
-    Converts int32 integers to their bit representations.
-    :param nums: Integers to convert.
-    :return: NumPy array of bits representing the integers.
-    """
-    return np.unpackbits(nums.astype(">i4").view(np.uint8)).reshape(-1, 32)
+    return (nums >> lsb_depth) != 0
