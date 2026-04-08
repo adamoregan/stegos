@@ -1,6 +1,6 @@
 from PySide6.QtCore import QThreadPool
 
-from stegos.gui.model.concurrency import Worker
+from stegos.gui.threading.worker import Worker
 
 
 class WorkerExecutor:

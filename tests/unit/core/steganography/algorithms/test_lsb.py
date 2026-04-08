@@ -6,7 +6,7 @@ from stegos.core.steganography.exception import (
     InsufficientCapacityException,
     InvalidCoverImageException,
 )
-from tests.unit.steganography.util import create_image
+from tests.unit.core.steganography.util import create_image
 
 
 @pytest.fixture()

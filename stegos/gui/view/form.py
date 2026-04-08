@@ -19,12 +19,12 @@ from PySide6.QtWidgets import (
 )
 
 from stegos.core.service import LSBSteganographyService
-from stegos.gui.controller.concurrency import WorkerExecutor
 from stegos.gui.model.steganography import (
     SteganographyModel,
     EmbeddingModel,
     ExtractionModel,
 )
+from stegos.gui.threading.executor import WorkerExecutor
 from stegos.gui.view.dialog import OverwriteMessageBox, ProgressDialog
 from stegos.gui.view.filesystem import FileSystemInput, MultiFileInput
 from stegos.gui.view.input import PasswordInput

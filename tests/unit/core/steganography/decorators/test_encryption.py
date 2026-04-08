@@ -3,7 +3,7 @@ from cryptography.fernet import InvalidToken
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 
 from stegos.core.steganography.decorators.encryption import EncryptionDecorator
-from tests.unit.steganography.util import create_image, Dummy
+from tests.unit.core.steganography.util import create_image, Dummy
 
 
 def _lightweight_argon2(salt: bytes) -> Argon2id:

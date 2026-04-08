@@ -15,8 +15,8 @@ from PySide6.QtWidgets import (
 )
 
 from stegos.gui.constants import Templates, Links
-from stegos.gui.model.concurrency import Worker
 from stegos.gui.model.dh import DHModel
+from stegos.gui.threading.worker import Worker
 from stegos.gui.util import read_resource
 from stegos.gui.view.button import IconButton
 from stegos.gui.view.label import BoldLabel, ErrorLabel

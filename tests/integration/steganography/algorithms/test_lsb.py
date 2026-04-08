@@ -5,7 +5,7 @@ import pytest
 from PIL import Image
 
 from stegos.core.steganography.algorithms.lsb import LSBSteganography
-from tests.unit.steganography.util import create_image
+from tests.unit.core.steganography.util import create_image
 
 
 def lossless_compression(stego_image: np.ndarray) -> np.ndarray:
