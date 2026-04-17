@@ -53,11 +53,11 @@ class EncryptionDecorator(BaseLSBSteganographyDecorator):
         key = self._kdf(salt).derive(self._password)
         return base64.urlsafe_b64encode(key)
 
-    def embed(self, cover_image: np.ndarray, payload: bytes) -> np.ndarray:
+    def embed(self, cover_image: np.ndarray, payload: bytes):
         salt = os.urandom(self.SALT_LENGTH)
         key = self._derive_key(salt)
         payload = salt + Fernet(key).encrypt(payload)
-        return self.strategy.embed(cover_image, payload)
+        self.strategy.embed(cover_image, payload)
 
     def extract(self, stego_image: np.ndarray) -> bytes:
         payload = super().extract(stego_image)

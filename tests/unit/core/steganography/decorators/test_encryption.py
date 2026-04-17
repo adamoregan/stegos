@@ -33,10 +33,10 @@ class TestEncryptionDecorator:
 
     def test_embed_extract(self, steg):
         """Payload should be encrypted before embedding and decrypted when extracted."""
-        payload = b"Embedded Payload"
-        embedded = steg.embed(create_image(), payload)
+        payload, image = b"Embedded Payload", create_image()
+        steg.embed(image, payload)
         assert steg.strategy._payload != payload
-        assert steg.extract(embedded) == payload
+        assert steg.extract(image) == payload
 
     def test_embed_extract_uniqueness(self, steg):
         """Embedding with the same password should not result in the same ciphertext."""
@@ -50,8 +50,8 @@ class TestEncryptionDecorator:
 
     def test_key_failure(self, steg):
         """Decryption should be key-dependent."""
-        payload = b"Embedded Payload"
-        embedded = steg.embed(create_image(), payload)
+        payload, image = b"Embedded Payload", create_image()
+        steg.embed(image, payload)
         steg2 = EncryptionDecorator(steg.strategy, b"wrong_password")
         with pytest.raises(InvalidToken):
-            steg2.extract(embedded)
+            steg2.extract(image)

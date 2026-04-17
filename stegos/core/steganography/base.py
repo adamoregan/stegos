@@ -25,12 +25,11 @@ class BaseLSBSteganography(ABC):
         return self._lsb_depth
 
     @abstractmethod
-    def embed(self, cover_image: np.ndarray, payload: bytes) -> np.ndarray:
+    def embed(self, cover_image: np.ndarray, payload: bytes) -> None:
         """
         Embed a payload into a cover image.
         :param cover_image: Image used as the carrier for hidden data.
         :param payload: Binary data to hide in the cover image.
-        :return: Stego image containing the embedded payload.
         """
         pass
 
@@ -72,5 +71,4 @@ class SeededSteganography(BaseLSBSteganography, ABC):
         :param pixels: NumPy array to generate random indices for.
         :return: NumPy array of randomised indices.
         """
-        rng = np.random.default_rng(self.seed)  # stateful
-        return rng.choice(pixels.size, pixels.size, replace=False)
+        return np.random.default_rng(self.seed).permutation(pixels.size)

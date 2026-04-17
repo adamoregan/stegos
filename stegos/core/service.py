@@ -84,9 +84,11 @@ class LSBSteganographyService:
         compressed = self._compress_payload(payload)
         if compression_type == ImageCompressionType.LOSSY:
             image = jio.read(cover_image)
-            image.coef_arrays[0][:] = strategy.embed(image.coef_arrays[0], compressed)
+            strategy.embed(image.coef_arrays[0], compressed)
             return image
-        return Image.fromarray(strategy.embed(np.array(image), compressed))
+        img_arr = np.array(image)
+        strategy.embed(img_arr, compressed)
+        return Image.fromarray(img_arr)
 
     def extract(
         self, stego_image: str, password: bytes

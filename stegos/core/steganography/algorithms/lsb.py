@@ -62,8 +62,6 @@ class LSBSteganography(SeededSteganography):
 
             bits_written += bits_to_write
 
-        return pixels.reshape(cover_image.shape)
-
     def extract(self, stego_image):
         pixels: np.ndarray = stego_image.ravel()
         random_indices = self._random_indices(pixels)

@@ -33,6 +33,6 @@ class TestLSBSteganography:
     )
     def test_embed_extract_file(self, steg, payload):
         """Embedding should survive lossless compression."""
-        cover_image = create_image()
-        stego_image = steg.embed(cover_image, payload)
-        assert steg.extract(lossless_compression(stego_image)) == payload
+        image = create_image()
+        steg.embed(image, payload)
+        assert steg.extract(lossless_compression(image)) == payload
