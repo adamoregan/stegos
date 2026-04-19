@@ -57,7 +57,7 @@ class EncryptionDecorator(BaseLSBSteganographyDecorator):
         salt = os.urandom(self.SALT_LENGTH)
         key = self._derive_key(salt)
         payload = salt + Fernet(key).encrypt(payload)
-        self.strategy.embed(cover_image, payload)
+        super().embed(cover_image, payload)
 
     def extract(self, stego_image: np.ndarray) -> bytes:
         payload = super().extract(stego_image)

@@ -10,7 +10,9 @@ class LossyLSBSteganography(LSBSteganography):
     def embed(self, cover_image, payload):
         coefs: np.ndarray = cover_image.ravel()
         mask = bitops.has_msbs_set(coefs, self.lsb_depth)
-        coefs[mask] = super().embed(coefs[mask], payload)
+        masked = coefs[mask]  # copy, must be written back
+        super().embed(masked, payload)
+        coefs[mask] = masked
 
     def extract(self, stego_image):
         coefs: np.ndarray = stego_image.ravel()
