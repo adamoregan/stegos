@@ -91,11 +91,11 @@ class SteganographyForm(QWidget):
 
     def _connect_signals(self) -> None:
         """Connects each relevant section to the model."""
-        self.password_input.input.textChanged.connect(self.model.set_password)
-        self.file_input.item_changed.connect(self.model.set_image)
-        self.filesystem_output.item_changed.connect(self.model.set_output)
+        self.password_input.passwordChanged.connect(self.model.set_password)
+        self.file_input.itemChanged.connect(self.model.set_image)
+        self.filesystem_output.itemChanged.connect(self.model.set_output)
 
-        self._model.can_process_changed.connect(
+        self._model.canProcessChanged.connect(
             lambda: self.button.setEnabled(self._model.can_process)
         )
 

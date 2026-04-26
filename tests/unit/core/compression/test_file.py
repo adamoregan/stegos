@@ -54,6 +54,7 @@ class TestZipCompressor:
         for filename, content in compressor.decompress(compressed):
             assert file.name.endswith(filename)
 
+    @pytest.mark.filterwarnings("ignore::UserWarning:zipfile")  # intended warning
     def test_compress_decompress_duplicates(self, compressor, tmp_path):
         """Compressing and decompressing should not overwrite files with the same name but different paths."""
         file_name = "file"

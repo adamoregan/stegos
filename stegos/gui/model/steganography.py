@@ -8,7 +8,7 @@ from stegos.core.steganography.util import is_image
 class SteganographyModel(QObject):
     """Base model for steganography operations."""
 
-    can_process_changed = Signal()
+    canProcessChanged = Signal()
 
     def __init__(self):
         """Creates an instance of SteganographyModel."""
@@ -31,7 +31,7 @@ class SteganographyModel(QObject):
         if self.image == image:
             return
         self._image = image
-        self.can_process_changed.emit()
+        self.canProcessChanged.emit()
 
     @property
     def password(self) -> str:
@@ -47,7 +47,7 @@ class SteganographyModel(QObject):
         if self.password == password:
             return
         self._password = password
-        self.can_process_changed.emit()
+        self.canProcessChanged.emit()
 
     @property
     def output(self) -> str:
@@ -64,7 +64,7 @@ class SteganographyModel(QObject):
         if self.output == output:
             return
         self._output = output
-        self.can_process_changed.emit()
+        self.canProcessChanged.emit()
 
     @abstractmethod
     def is_valid_output(self) -> bool:
@@ -98,7 +98,7 @@ class EmbeddingModel(SteganographyModel):
         if self._payload == payload:
             return
         self._payload = payload
-        self.can_process_changed.emit()
+        self.canProcessChanged.emit()
 
     def is_valid_output(self) -> bool:
         return Path(self.output).is_file()

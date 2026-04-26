@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
         self.mode_group.idToggled.connect(self._set_form)
         for form in (self.extraction_form, self.embedding_form):
             form.file_input.input.textChanged.connect(self.preview.set_image)
-        self.dh_model.shared_key_generated.connect(self._set_password)
+        self.dh_model.sharedKeyGenerated.connect(self._set_password)
 
     @Slot(bytes)
     def _set_password(self, key: bytes) -> None:
@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
         :param key: Key to set as the password.
         """
         current_form: SteganographyForm = self.form_stack.currentWidget()
-        current_form.password_input.input.setText(key.hex())
+        current_form.password_input.set_password(key.hex())
 
     @Slot(int)
     def _set_form(self, index: int) -> None:

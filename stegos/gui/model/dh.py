@@ -9,8 +9,8 @@ class DHModel(QObject):
     Emits key change and error signals.
     """
 
-    public_key_changed = Signal(bytes)
-    shared_key_generated = Signal(bytes)
+    publicKeyChanged = Signal(bytes)
+    sharedKeyGenerated = Signal(bytes)
     error = Signal()
 
     def __init__(self, dh: BaseDH):
@@ -28,8 +28,8 @@ class DHModel(QObject):
         """
         try:
             shared_key = self._dh.exchange(peer_public_key)
-            self.shared_key_generated.emit(shared_key)
-            self.public_key_changed.emit(self._dh.public_key)
+            self.sharedKeyGenerated.emit(shared_key)
+            self.publicKeyChanged.emit(self._dh.public_key)
         except ValueError:
             self.error.emit()
 
@@ -44,4 +44,4 @@ class DHModel(QObject):
     def rotate(self) -> None:
         """Rotates the public key."""
         self._dh.rotate()
-        self.public_key_changed.emit(self._dh.public_key)
+        self.publicKeyChanged.emit(self._dh.public_key)

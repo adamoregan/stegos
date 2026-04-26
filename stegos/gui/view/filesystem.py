@@ -25,7 +25,7 @@ class FileSystemDropList(QListWidget):
         self.setToolTip(tooltip)
 
         self.drop_handler = FileSystemDropHandler(self)
-        self.drop_handler.items_dropped.connect(self.addItems)
+        self.drop_handler.itemsDropped.connect(self.addItems)
 
 
 class FileSystemLineEdit(QLineEdit):
@@ -38,13 +38,13 @@ class FileSystemLineEdit(QLineEdit):
         """
         super().__init__(placeholderText=placeholderText)
         self.drop_handler = FileSystemDropHandler(self)
-        self.drop_handler.items_dropped.connect(lambda items: self.setText(items[0]))
+        self.drop_handler.itemsDropped.connect(lambda items: self.setText(items[0]))
 
 
 class FileSystemInput(QWidget):
     """Input with file system browsing and drag-and-drop functionality."""
 
-    item_changed = Signal(str)
+    itemChanged = Signal(str)
 
     def __init__(
         self,
@@ -66,7 +66,7 @@ class FileSystemInput(QWidget):
         layout.addWidget(self.input)
         layout.addWidget(self.browse_button)
 
-        self.input.textChanged.connect(self.item_changed)
+        self.input.textChanged.connect(self.itemChanged)
 
     @Slot()
     def _browse(self):

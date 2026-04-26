@@ -139,11 +139,11 @@ class DHKEDialog(QDialog):
 
     def _connect_signals(self) -> None:
         """Connects the signals for the model and error handling."""
-        self._model.public_key_changed.connect(
+        self._model.publicKeyChanged.connect(
             lambda key: self.key_output.setPlainText(key.hex())
         )
         self._model.error.connect(lambda: self.error_label.setVisible(True))
-        self._model.shared_key_generated.connect(self.accept)
+        self._model.sharedKeyGenerated.connect(self.accept)
         self.key_input.textChanged.connect(self.on_key_input_change)
 
     def generate_shared_key(self):
