@@ -1,4 +1,4 @@
-from PySide6.QtCore import QEvent, Slot
+from PySide6.QtCore import Slot
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
@@ -14,9 +14,8 @@ from PySide6.QtWidgets import (
 
 from stegos.core.cryptography.dh.x25519 import X25519
 from stegos.core.service import LSBSteganographyService
-from stegos.gui.constants import Stylesheets
+from stegos.gui.services.resources import StyleSheetService
 from stegos.gui.model.dh import DHModel
-from stegos.gui.util import read_resource
 from stegos.gui.view.form import ExtractionForm, EmbeddingForm, SteganographyForm
 from stegos.gui.view.image import ImagePreview
 from stegos.gui.view.menu import AppMenuBar
@@ -118,12 +117,6 @@ class MainWindow(QMainWindow):
         self.preview.set_image(path)
 
 
-def load_stylesheets() -> str:
-    """Loads the application stylesheets."""
-    stylesheets = (Stylesheets.BASE, Stylesheets.from_color_scheme())
-    return "".join(read_resource(stylesheet) for stylesheet in stylesheets)
-
-
 class SteganographyApplication(QApplication):
     """Application for steganography operations."""
 
@@ -132,16 +125,4 @@ class SteganographyApplication(QApplication):
         super().__init__(*args, **kwargs)
         self.setWindowIcon(QIcon(":app.png"))
 
-        self._current_theme = self.styleHints().colorScheme()
-        self.setStyleSheet(load_stylesheets())
-
-    def event(self, event: QEvent) -> bool:
-        """Updates the application stylesheets if there has been a theme change."""
-        handled = super().event(event)
-        if event.type() == QEvent.Type.ApplicationPaletteChange:
-            theme = self.styleHints().colorScheme()
-            if theme == self._current_theme:
-                return
-            self._current_theme = theme
-            self.setStyleSheet(load_stylesheets())
-        return handled
+        self._style_service = StyleSheetService(self)
