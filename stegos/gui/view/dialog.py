@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QIcon, QCursor
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDialog,
     QWidget,
@@ -8,17 +8,17 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QPlainTextEdit,
     QPushButton,
-    QToolTip,
     QTextBrowser,
-    QMessageBox,
     QProgressDialog,
+    QLabel,
+    QStyle,
 )
 
 from stegos.gui.constants import Templates, Links
 from stegos.gui.model.dh import DHModel
 from stegos.gui.threading.worker import Worker
 from stegos.gui.util import read_resource
-from stegos.gui.view.button import IconButton
+from stegos.gui.view.button import IconButton, PasteButton, CopyButton
 from stegos.gui.view.label import BoldLabel, ErrorLabel
 
 
@@ -84,9 +84,7 @@ class DHKEDialog(QDialog):
         self.key_output = QPlainTextEdit(self._model.public_key.hex(), readOnly=True)
         key_output_layout.addWidget(self.key_output)
 
-        self.copy_btn = IconButton(
-            QIcon.fromTheme(QIcon.ThemeIcon.EditCopy), "Copy to Clipboard"
-        )
+        self.copy_btn = CopyButton(self)
         self.copy_btn.clicked.connect(self.copy_key)
         self.refresh_btn = IconButton(
             QIcon.fromTheme(QIcon.ThemeIcon.ViewRefresh), "Refresh Key"
@@ -113,11 +111,8 @@ class DHKEDialog(QDialog):
 
         input_layout.addWidget(self.key_input)
 
-        self.paste_btn = IconButton(
-            QIcon.fromTheme(QIcon.ThemeIcon.EditPaste), "Paste from Clipboard"
-        )
+        self.paste_btn = PasteButton(self)
         self.paste_btn.clicked.connect(self.paste_key)
-        QApplication.clipboard().dataChanged.connect(self.update_paste_enabled)
 
         input_layout.addWidget(self.paste_btn)
         input_layout.setAlignment(self.paste_btn, Qt.AlignmentFlag.AlignTop)
@@ -165,12 +160,6 @@ class DHKEDialog(QDialog):
         self.error_label.setVisible(False)
 
     @Slot()
-    def update_paste_enabled(self):
-        """Updates the state of the paste button based on the content of the clipboard."""
-        clipboard_text = QApplication.clipboard().text()
-        self.paste_btn.setEnabled(bool(clipboard_text.strip()))
-
-    @Slot()
     def paste_key(self):
         """Pastes the peer key from the clipboard."""
         self.key_input.setPlainText(QApplication.clipboard().text())
@@ -179,7 +168,6 @@ class DHKEDialog(QDialog):
     def copy_key(self):
         """Copies the public key to the clipboard."""
         QApplication.clipboard().setText(self.key_output.toPlainText())
-        QToolTip.showText(QCursor.pos(), "Copied to Clipboard")
 
 
 class ProgressDialog(QProgressDialog):
@@ -190,7 +178,7 @@ class ProgressDialog(QProgressDialog):
         worker: Worker,
         title: str = "Loading",
         labelText: str = "Loading...",
-        parent=None,
+        parent: QWidget = None,
     ):
         """
         Creates an instance of ProgressDialog.
@@ -214,23 +202,60 @@ class ProgressDialog(QProgressDialog):
         return self._worker
 
 
-class OverwriteMessageBox(QMessageBox):
-    """Message box prompting the user to confirm if they want to overwrite an existing file."""
+class TextDialog(QDialog):
+    """Dialog for showing scrollable, read-only text."""
 
-    def __init__(self, file: str, parent=None):
+    def __init__(self, title: str, text: str, content: str, parent: QWidget = None):
         """
-        Creates an instance of OverwriteMessageBox.
-        :param file: Existing file to overwrite.
-        :param parent: Parent of the message box.
+        Creates an instance of TextDialog.
+        :param title: Title of the dialog.
+        :param text: Text to show above the text area.
+        :param content: Text to show in the read-only text area.
+        :param parent: Parent of the dialog.
         """
-        super().__init__(
-            QMessageBox.Icon.Warning,
-            "Overwrite File?",
-            f"File '{file}' already exists.",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            parent,
-            informativeText="Do you want to overwrite it?",
-        )
-        self.setDefaultButton(
-            QMessageBox.StandardButton.No
-        )  # helps avoid accidental overwrites
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self._create_ui(text, content)
+
+    def _create_ui(self, text: str, content: str):
+        layout = QHBoxLayout(self)
+
+        icon_label = QLabel()
+        icon = self.style().standardIcon(QStyle.StandardPixmap.SP_MessageBoxInformation)
+        icon_label.setPixmap(icon.pixmap(32, 32))
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        layout.addWidget(icon_label)
+
+        content_layout = QVBoxLayout()
+        self._message_label = QLabel(text)
+        content_layout.addWidget(self._message_label)
+
+        self._text_edit = QPlainTextEdit(content, readOnly=True)
+        content_layout.addWidget(self._text_edit)
+
+        button_layout = QHBoxLayout()
+
+        accept_button = QPushButton("OK")
+        accept_button.clicked.connect(self.accept)
+
+        button_layout.addWidget(accept_button)
+        content_layout.addLayout(button_layout)
+
+        layout.addLayout(content_layout)
+
+    def text(self) -> str:
+        """Gets the text above the read-only text area."""
+        return self._message_label.text()
+
+    def set_text(self, text: str) -> None:
+        """Sets the text above the read-only text area."""
+        return self._message_label.setText(text)
+
+    def content(self) -> str:
+        """Gets the read-only area text."""
+        return self._text_edit.toPlainText()
+
+    def set_content(self, content: str):
+        """Sets the read-only area text."""
+        self._text_edit.setPlainText(content)

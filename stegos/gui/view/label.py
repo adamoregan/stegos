@@ -3,7 +3,7 @@ from PySide6.QtGui import QIcon, QResizeEvent, QPixmap
 from PySide6.QtWidgets import QLabel, QWidget, QHBoxLayout, QStyle
 
 
-class IconLabel(QLabel):
+class ThemedIconLabel(QLabel):
     """Label that shows an icon that automatically changes based on the current application theme."""
 
     def __init__(
@@ -12,7 +12,7 @@ class IconLabel(QLabel):
         pixel_metric: QStyle.PixelMetric = QStyle.PixelMetric.PM_SmallIconSize,
     ):
         """
-        Creates an instance of IconLabel.
+        Creates an instance of ThemedIconLabel.
         :param icon: Icon of the label.
         :param pixel_metric: Size of the icon.
         """
@@ -48,7 +48,7 @@ class ErrorLabel(QWidget):
         :param text: Text to set the label to.
         """
         super().__init__(visible=False)
-        self._icon_label = IconLabel(QIcon.ThemeIcon.DialogError)
+        self._icon_label = ThemedIconLabel(QIcon.ThemeIcon.DialogError)
         self._text_label = QLabel(text)
         self._text_label.setProperty("class", "error")
         self._create_layout()

@@ -25,9 +25,14 @@ from stegos.gui.model.steganography import (
     ExtractionModel,
 )
 from stegos.gui.threading.executor import WorkerExecutor
-from stegos.gui.view.dialog import OverwriteMessageBox, ProgressDialog
+from stegos.gui.view.dialog import ProgressDialog, TextDialog
 from stegos.gui.view.filesystem import FileSystemInput, MultiFileInput
 from stegos.gui.view.input import PasswordInput
+from stegos.gui.view.msgbox import (
+    OverwriteMessageBox,
+    EmbeddingMessageBoxFactory,
+    ExtractionMessageBoxFactory,
+)
 
 
 class SteganographyForm(QWidget):
@@ -211,9 +216,7 @@ class EmbeddingForm(SteganographyForm):
         )
         worker.signals.result.connect(self._handle_embedding_result)
         worker.signals.error.connect(
-            lambda e: QMessageBox.critical(
-                self, "Error", "An error occurred during embedding."
-            )
+            lambda e: EmbeddingMessageBoxFactory.create(e, self).exec()
         )
 
     @Slot()
@@ -269,9 +272,7 @@ class ExtractionForm(SteganographyForm):
         )
         worker.signals.result.connect(self._handle_extraction)
         worker.signals.error.connect(
-            lambda e: QMessageBox.critical(
-                self, "Error", "An error occurred during extraction."
-            )
+            lambda e: ExtractionMessageBoxFactory.create(e, self).exec()
         )
 
     @Slot()
@@ -279,11 +280,11 @@ class ExtractionForm(SteganographyForm):
         """Saves and shows dialogs for the extracted files/bytes."""
         name, content = extracted[0], extracted[1]
         if name == "output":
-            QMessageBox.information(
-                self,
+            TextDialog(
                 "Extracted Message",
-                f"The following message was extracted:<br><br>'{content.decode()}'",
-            )
+                "The following message was extracted:",
+                content.decode(),
+            ).exec()
         else:
             with open(f"{self.model.output}{name}", "wb") as file:
                 file.write(content)
