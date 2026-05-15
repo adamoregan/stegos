@@ -1,6 +1,9 @@
+import secrets
+
 import numpy as np
 
 from stegos.core.steganography import bitops
+from stegos.core.steganography.bitops import BITS_PER_BYTE
 from stegos.core.steganography.exception import (
     InsufficientCapacityException,
     InvalidCoverImageException,
@@ -16,13 +19,27 @@ class LSBSteganography(SeededSteganography):
 
     PAYLOAD_SIZE_BYTES = 4
 
-    def __init__(self, seed: int, lsb_depth: int = 2):
-        super().__init__(seed, lsb_depth)
+    def __init__(self, lsb_depth: int = 2):
+        super().__init__(lsb_depth)
 
     def _payload_capacity(self, cover_image):
-        capacity = len(cover_image) - self.PAYLOAD_SIZE_BYTES * 8
+        capacity = len(cover_image) - (self.PAYLOAD_SIZE_BYTES * BITS_PER_BYTE)
+        capacity -= self.SEED_SIZE_BYTES * BITS_PER_BYTE
         capacity *= self.lsb_depth
         return capacity // 8
+
+    def _validate_capacity(self, capacity: int, payload_size: int):
+        """
+        Validates image capacity to ensure the payload can be embedded.
+        :param capacity: Image capacity.
+        :param payload_size: Size of the payload in bytes
+        """
+        if capacity <= 0:
+            raise InvalidCoverImageException(
+                f"cover image capacity insufficient to store payload header of {self.PAYLOAD_SIZE_BYTES} bytes"
+            )
+        elif capacity < payload_size:
+            raise InsufficientCapacityException(payload_size, capacity)
 
     def embed(self, cover_image, payload):
         payload_size = len(payload)
@@ -32,14 +49,16 @@ class LSBSteganography(SeededSteganography):
         pixels: np.ndarray = cover_image.ravel()
 
         payload_capacity = self._payload_capacity(pixels)
-        if payload_capacity <= 0:
-            raise InvalidCoverImageException(
-                f"cover image capacity insufficient to store payload header of {self.PAYLOAD_SIZE_BYTES} bytes"
-            )
-        elif payload_capacity < payload_size:
-            raise InsufficientCapacityException(payload_size, payload_capacity)
+        self._validate_capacity(payload_capacity, payload_size)
+
+        self._seed = secrets.randbits(self.SEED_SIZE_BYTES * BITS_PER_BYTE)
+        seed_bits = bitops.int_to_bits(self._seed, self.SEED_SIZE_BYTES)
+        pixels[: len(seed_bits)] = bitops.embed_bits(
+            pixels[: len(seed_bits)], seed_bits, 0
+        )
 
         random_indices = self._random_indices(pixels)
+        random_indices = random_indices[random_indices >= len(seed_bits)]
 
         payload_bits = bitops.bytes_to_bits(payload)
         size_bits = bitops.int_to_bits(len(payload_bits), self.PAYLOAD_SIZE_BYTES)
@@ -64,9 +83,13 @@ class LSBSteganography(SeededSteganography):
 
     def extract(self, stego_image):
         pixels: np.ndarray = stego_image.ravel()
-        random_indices = self._random_indices(pixels)
 
-        payload_size_bits = self.PAYLOAD_SIZE_BYTES * 8
+        seed_bits = bitops.get_bit(pixels[: self.SEED_SIZE_BYTES * BITS_PER_BYTE])
+        self._seed = bitops.bits_to_int(seed_bits)
+        random_indices = self._random_indices(pixels)
+        random_indices = random_indices[random_indices >= len(seed_bits)]
+
+        payload_size_bits = self.PAYLOAD_SIZE_BYTES * BITS_PER_BYTE
         size_bits = bitops.get_bit(
             pixels[random_indices[:payload_size_bits]], bit_index=0
         )
@@ -74,15 +97,15 @@ class LSBSteganography(SeededSteganography):
 
         bits_read = 0
         payload = np.empty(payload_size_bits + payload_size, dtype=np.uint8)
-        for bit_pos in range(self.lsb_depth):
+        for bit_index in range(self.lsb_depth):
             if bits_read >= payload_size:
                 break
 
             remaining = len(payload) - bits_read
-            bits_to_read = min(pixels.size, remaining)
+            bits_to_read = min(len(random_indices), remaining)
 
             read_indices = random_indices[:bits_to_read]
-            bits = bitops.get_bit(pixels[read_indices], bit_pos)
+            bits = bitops.get_bit(pixels[read_indices], bit_index)
 
             payload[bits_read : bits_read + bits_to_read] = bits
             bits_read += bits_to_read

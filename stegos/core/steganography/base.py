@@ -46,24 +46,15 @@ class BaseLSBSteganography(ABC):
 class SeededSteganography(BaseLSBSteganography, ABC):
     """Abstract base class defining a seeded LSB image steganography algorithm."""
 
-    def __init__(self, seed: int, lsb_depth: int):
+    SEED_SIZE_BYTES = 4
+
+    def __init__(self, lsb_depth: int):
         """
         Creates an instance of the SeededSteganography class.
-        :param seed: Seed controlling algorithm randomness.
         :param lsb_depth: Least significant bit embedding depth of the algorithm.
         """
         super().__init__(lsb_depth)
-        if not isinstance(seed, int):
-            raise TypeError(f"seed must be an int, not {type(seed).__name__}")
-        self._seed = seed
-
-    @property
-    def seed(self) -> int:
-        """
-        Gets the seed controlling algorithm randomness.
-        :return: Seed value.
-        """
-        return self._seed
+        self._seed = 0
 
     def _random_indices(self, pixels: np.ndarray) -> np.ndarray:
         """
@@ -71,4 +62,4 @@ class SeededSteganography(BaseLSBSteganography, ABC):
         :param pixels: NumPy array to generate random indices for.
         :return: NumPy array of randomised indices.
         """
-        return np.random.default_rng(self.seed).permutation(pixels.size)
+        return np.random.default_rng(self._seed).permutation(pixels.size)

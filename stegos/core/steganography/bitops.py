@@ -2,6 +2,8 @@
 
 import numpy as np
 
+BITS_PER_BYTE = 8
+
 
 def bytes_to_bits(data: bytes) -> np.ndarray:
     """

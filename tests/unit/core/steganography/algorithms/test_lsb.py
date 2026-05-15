@@ -11,7 +11,7 @@ from tests.unit.core.steganography.util import create_image
 
 @pytest.fixture()
 def steg():
-    return LSBSteganography(seed=1)
+    return LSBSteganography()
 
 
 class TestLSBSteganography:
@@ -35,7 +35,7 @@ class TestLSBSteganography:
     def test_embed_extract_lsb_depths(self, lsb_depth: int):
         """Embedding and extracting a payload should work for all LSB depths."""
         cover_image = create_image()
-        steg = LSBSteganography(seed=1, lsb_depth=lsb_depth)
+        steg = LSBSteganography(lsb_depth)
         max_payload_size = steg._payload_capacity(cover_image.ravel())
         payload = (
             np.random.default_rng(seed=1)
@@ -45,11 +45,12 @@ class TestLSBSteganography:
         steg.embed(cover_image, payload)
         assert steg.extract(cover_image) == payload
 
-    def test_embed_randomisation(self, steg):
-        """Embedding should be seed-independent. The payload should only be recoverable with the correct seed."""
+    def test_extract_different_instances(self, steg):
+        """Extraction should be instance-independent, as long as the instance has sufficient depth."""
         cover_image, payload = create_image(), b"Embedded Payload"
         steg.embed(cover_image, payload)
-        assert LSBSteganography(seed=steg.seed + 1).extract(cover_image) != payload
+        assert LSBSteganography().extract(cover_image) == payload
+        assert LSBSteganography(steg.lsb_depth + 1).extract(cover_image) == payload
 
     def test_embed_empty(self, steg):
         """Embedding an empty payload should raise an exception."""

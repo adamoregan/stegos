@@ -43,10 +43,10 @@ class LSBSteganographyService:
         :param password: Password used to encrypt the payload.
         :return: Image steganography strategy configured based on compression type.
         """
-        strategy = LSBSteganography(1)
+        strategy = LSBSteganography()
         match compression_type:
             case ImageCompressionType.LOSSY:
-                strategy = LossyLSBSteganography(1)
+                strategy = LossyLSBSteganography()
             case ImageCompressionType.MIXED:
                 if MixedFormat.type(image) == ImageCompressionType.LOSSY:
                     raise UnsupportedImageFormatException(

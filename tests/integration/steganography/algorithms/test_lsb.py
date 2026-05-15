@@ -21,7 +21,7 @@ def lossless_compression(stego_image: np.ndarray) -> np.ndarray:
 
 @pytest.fixture()
 def steg():
-    return LSBSteganography(seed=1)
+    return LSBSteganography()
 
 
 class TestLSBSteganography:
