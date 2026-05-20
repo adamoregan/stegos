@@ -18,8 +18,9 @@ class LSBSteganography(SeededSteganography):
     """
 
     PAYLOAD_SIZE_BYTES = 4
+    SAFE_DEPTH = 2
 
-    def __init__(self, lsb_depth: int = 2):
+    def __init__(self, lsb_depth: int = SAFE_DEPTH):
         super().__init__(lsb_depth)
 
     def _payload_capacity(self, cover_image):

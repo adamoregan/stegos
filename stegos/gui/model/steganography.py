@@ -13,21 +13,21 @@ class SteganographyModel(QObject):
     def __init__(self):
         """Creates an instance of SteganographyModel."""
         super().__init__()
-        self._image = ""
+        self._image: Path = None
+        self._output: Path = None
         self._password = ""
-        self._output = ""
 
     @property
-    def image(self) -> str:
+    def image(self) -> Path:
         """Gets the path of the image."""
         return self._image
 
-    def set_image(self, image: str) -> None:
+    def set_image(self, image: str | Path) -> None:
         """
         Sets the image used for steganography operations.
         :param image: Image path.
         """
-        image = image.strip()
+        image = Path(image)
         if self.image == image:
             return
         self._image = image
@@ -50,17 +50,17 @@ class SteganographyModel(QObject):
         self.canProcessChanged.emit()
 
     @property
-    def output(self) -> str:
+    def output(self) -> Path:
         return self._output
 
-    def set_output(self, output: str) -> None:
+    def set_output(self, output: str | Path) -> None:
         """
         Sets the output for steganography operations.
 
         Defines where the result of operations will be stored.
         :param output: Output path for steganography applications.
         """
-        output = output.strip()
+        output = Path(output)
         if self.output == output:
             return
         self._output = output
@@ -101,7 +101,7 @@ class EmbeddingModel(SteganographyModel):
         self.canProcessChanged.emit()
 
     def is_valid_output(self) -> bool:
-        return Path(self.output).is_file()
+        return self.output.suffix == self.image.suffix
 
     @property
     def can_process(self) -> bool:
@@ -117,4 +117,4 @@ class ExtractionModel(SteganographyModel):
         super().__init__()
 
     def is_valid_output(self) -> bool:
-        return Path(self.output).is_dir()
+        return self.output.is_dir()

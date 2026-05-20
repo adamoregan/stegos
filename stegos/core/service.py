@@ -1,22 +1,29 @@
 import io
 import lzma
 import zipfile
+from dataclasses import dataclass
 from typing import Iterable, Generator
 
 import jpegio as jio
 import numpy as np
-from PIL import Image
+from PIL import Image as PILImage
 
 from stegos.core.compression.file import FileCompressor, ZipCompressor
 from stegos.core.constants import (
-    get_compression_type,
+    compression_type,
     ImageCompressionType,
-    MixedFormat,
 )
-from stegos.core.exception import UnsupportedImageFormatException
-from stegos.core.steganography.algorithms.lossy import LossyLSBSteganography
-from stegos.core.steganography.algorithms.lsb import LSBSteganography
-from stegos.core.steganography.decorators.encryption import EncryptionDecorator
+from stegos.core.image import JPEGImage, Image
+from stegos.core.steganography.builder import SteganographyStrategyBuilder
+
+
+@dataclass
+class ExtractedItem:
+    """Item extracted from an image."""
+
+    content: bytes
+    is_file: bytes
+    name: str = None
 
 
 class LSBSteganographyService:
@@ -32,28 +39,6 @@ class LSBSteganographyService:
         """
         self._file_compressor = file_compressor or ZipCompressor()
 
-    @staticmethod
-    def _get_strategy(
-        compression_type: ImageCompressionType, image: Image.Image, password: bytes
-    ) -> EncryptionDecorator:
-        """
-        Gets the appropriate image steganography strategy.
-        :param compression_type: Compression type of the image.
-        :param image: Image used as a cover image or stego image.
-        :param password: Password used to encrypt the payload.
-        :return: Image steganography strategy configured based on compression type.
-        """
-        strategy = LSBSteganography()
-        match compression_type:
-            case ImageCompressionType.LOSSY:
-                strategy = LossyLSBSteganography()
-            case ImageCompressionType.MIXED:
-                if MixedFormat.type(image) == ImageCompressionType.LOSSY:
-                    raise UnsupportedImageFormatException(
-                        "mixed image formats with lossy compression are unsupported"
-                    )
-        return EncryptionDecorator(strategy, password)
-
     def _compress_payload(self, payload) -> bytes:
         """
         Compresses a payload.
@@ -66,7 +51,7 @@ class LSBSteganographyService:
 
     def embed(
         self, cover_image: str, payload: bytes | Iterable[str], password: bytes
-    ) -> Image.Image | jio.DecompressedJpeg:
+    ) -> Image:
         """
         Embeds a payload into an image.
 
@@ -76,23 +61,23 @@ class LSBSteganographyService:
         :param password: Password used to encrypt the payload. A key is derived from the password.
         :return:
         """
-        image = Image.open(cover_image)
-        compression_type = get_compression_type(image)
-        strategy = LSBSteganographyService._get_strategy(
-            compression_type, image, password
+        image = PILImage.open(cover_image)
+        comp_type = compression_type(image)
+        strategy = (
+            SteganographyStrategyBuilder(comp_type, image).encryption(password).build()
         )
         compressed = self._compress_payload(payload)
-        if compression_type == ImageCompressionType.LOSSY:
+        if comp_type == ImageCompressionType.LOSSY:
             image = jio.read(cover_image)
             strategy.embed(image.coef_arrays[0], compressed)
-            return image
+            return JPEGImage(image)
         img_arr = np.array(image)
         strategy.embed(img_arr, compressed)
-        return Image.fromarray(img_arr)
+        return PILImage.fromarray(img_arr)
 
     def extract(
         self, stego_image: str, password: bytes
-    ) -> Generator[tuple[str, bytes], None, None]:
+    ) -> Generator[ExtractedItem, None, None]:
         """
         Extracts a payload from an image.
 
@@ -101,16 +86,16 @@ class LSBSteganographyService:
         :return: If the payload is an archive, returns the names and contents of each file. Otherwise, returns "output"
         and the embedded bytes.
         """
-        image = Image.open(stego_image)
-        compression_type = get_compression_type(image)
-        strategy = LSBSteganographyService._get_strategy(
-            compression_type, image, password
+        image = PILImage.open(stego_image)
+        comp_type = compression_type(image)
+        strategy = (
+            SteganographyStrategyBuilder(comp_type, image).encryption(password).build()
         )
-        if compression_type == ImageCompressionType.LOSSY:
+        if comp_type == ImageCompressionType.LOSSY:
             image = jio.read(stego_image).coef_arrays[0]
         extracted = strategy.extract(np.array(image))
         if zipfile.is_zipfile(io.BytesIO(extracted)):
             for name, content in self._file_compressor.decompress(extracted):
-                yield name, content
+                yield ExtractedItem(content, is_file=True, name=name)
         else:
-            yield "output", lzma.decompress(extracted)
+            yield ExtractedItem(lzma.decompress(extracted), is_file=False)

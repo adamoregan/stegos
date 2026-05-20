@@ -1,6 +1,11 @@
+import os
+from pathlib import Path
+
 from PySide6.QtCore import QObject, Signal, QEvent
 from PySide6.QtGui import QDragEnterEvent, QDropEvent, QDragMoveEvent
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QMessageBox
+
+from stegos.gui.view.msgbox import OverwriteMessageBox
 
 
 class FileSystemDropHandler(QObject):
@@ -62,3 +67,26 @@ class FileSystemDropHandler(QObject):
                 self._handle_dropped_items(event)
                 return True
         return False
+
+
+class IOController:
+    """Controller for I/O."""
+
+    def __init__(self, parent: QWidget = None):
+        """
+        Creates an instance of IOController.
+        :param parent: Parent of IO-related dialogs.
+        """
+        self._parent = parent
+
+    def confirm_overwrite(self, path: str | Path) -> bool:
+        """
+        Prompts to overwrite existing file/directory.
+        :param path: Path to check.
+        :return: If the resource should be overwritten.
+        """
+        if os.path.isfile(path) or os.path.isdir(path):
+            res = OverwriteMessageBox(path, self._parent).exec()
+            if res == QMessageBox.StandardButton.No:
+                return False
+        return True

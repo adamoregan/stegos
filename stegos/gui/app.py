@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
@@ -35,8 +35,7 @@ class MainWindow(QMainWindow):
         """Creates an instance of MainWindow."""
         super().__init__()
         self.setWindowTitle("Stegos")
-        self.setMinimumSize(800, 600)
-
+        self.setMinimumWidth(800)
         self.dh_model = DHModel(X25519())
         self.setMenuBar(AppMenuBar(self, self.dh_model))
         self.service = LSBSteganographyService()
@@ -115,6 +114,15 @@ class MainWindow(QMainWindow):
         current_form: SteganographyForm = self.form_stack.currentWidget()
         path = current_form.file_input.input.text()
         self.preview.set_image(path)
+        QTimer.singleShot(0, self._resize)
+
+    def _resize(self):
+        """Resizes the height of the window based on the current form."""
+        self.form_stack.setMinimumHeight(
+            self.form_stack.currentWidget().sizeHint().height()
+        )
+        new_size = self.form_stack.currentWidget().sizeHint()
+        self.resize(new_size)
 
 
 class SteganographyApplication(QApplication):

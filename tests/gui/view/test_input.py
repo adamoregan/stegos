@@ -44,3 +44,9 @@ class TestPasswordInput:
         qtbot.keyClicks(password_input._input, password)
         assert spy.count() == len(password)
         assert spy.at(spy.count() - 1)[0] == password
+
+    def test_set_password(self, password_input):
+        """Setting the password should strip whitespace."""
+        password = " secret "
+        password_input.set_password(password)
+        assert password_input.password() == password.strip()

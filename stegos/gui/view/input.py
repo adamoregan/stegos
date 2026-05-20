@@ -24,7 +24,7 @@ class PasswordInput(QWidget):
         Sets the password text.
         :param password: Password to display in the input field.
         """
-        self._input.setText(password)
+        self._input.setText(password.strip())
 
     @property
     def is_visible(self) -> bool:

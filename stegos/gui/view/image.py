@@ -34,7 +34,7 @@ class ImagePreview(QWidget):
         :param image: Image to preview.
         """
         if not image:
-            self._label.clear()
+            self._label.setPixmap(None)
             self._label.setText("No Image Selected")
             return
         if is_image(image):

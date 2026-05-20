@@ -1,6 +1,6 @@
 from PySide6.QtCore import Slot, QUrl
 from PySide6.QtGui import QAction, QDesktopServices, QKeySequence
-from PySide6.QtWidgets import QMenuBar, QMainWindow, QMessageBox, QMenu
+from PySide6.QtWidgets import QMenuBar, QMainWindow, QMessageBox, QMenu, QApplication
 
 from stegos.gui.constants import Templates, Links
 from stegos.gui.model.dh import DHModel
@@ -69,8 +69,8 @@ class AppMenuBar(QMenuBar):
     def _create_file_menu(self) -> None:
         """Creates the file menu."""
         menu = self.addMenu("File")
-        exit_app = QAction("Exit", self, shortcut="Ctrl+Q")
-        exit_app.triggered.connect(self.parent().close)
+        exit_app = QAction("Exit", self, shortcut=QKeySequence.StandardKey.Quit)
+        exit_app.triggered.connect(QApplication.instance().quit)
         menu.addAction(exit_app)
 
     def _create_tools_menu(self) -> None:

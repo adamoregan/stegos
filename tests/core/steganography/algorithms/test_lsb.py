@@ -1,12 +1,26 @@
+from io import BytesIO
+
 import numpy as np
 import pytest
+from PIL import Image
 
 from stegos.core.steganography.algorithms.lsb import LSBSteganography
 from stegos.core.steganography.exception import (
     InsufficientCapacityException,
     InvalidCoverImageException,
 )
-from tests.unit.core.steganography.util import create_image
+from tests.core.steganography.util import create_image
+
+
+def lossless_compression(stego_image: np.ndarray) -> np.ndarray:
+    """
+    Simulates lossless compression.
+    :param stego_image: Stego image to perform lossless compression on.
+    :return: Stego image after lossless compression.
+    """
+    buf = BytesIO()
+    Image.fromarray(stego_image).save(buf, format="PNG")
+    return np.array(Image.open(buf))
 
 
 @pytest.fixture()
@@ -67,3 +81,18 @@ class TestLSBSteganography:
         """Embedding in an image that is too small should raise an exception."""
         with pytest.raises(InvalidCoverImageException):
             steg.embed(create_image(1, 1), b"Em")
+
+    @pytest.mark.parametrize(
+        ("cover_image", "payload"),
+        [
+            (create_image(), b"Embedded Payload"),
+            (create_image(mode="RGB"), b"Embedded Payload"),
+            (create_image(), create_image(2, 2).tobytes()),
+            (create_image(mode="RGB"), create_image(2, 2).tobytes()),
+        ],
+    )
+    @pytest.mark.integration
+    def test_embed_extract_save(self, steg, cover_image, payload):
+        """Embedding should survive lossless compression."""
+        steg.embed(cover_image, payload)
+        assert steg.extract(lossless_compression(cover_image)) == payload

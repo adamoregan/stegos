@@ -3,7 +3,6 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDialog,
     QWidget,
-    QApplication,
     QVBoxLayout,
     QHBoxLayout,
     QPlainTextEdit,
@@ -61,7 +60,7 @@ class DHKEDialog(QDialog):
         super().__init__(parent)
         self._model = model
         self.setWindowTitle("Diffie-Hellman Key Exchange")
-        self.setFixedSize(300, 250)
+        self.setFixedSize(325, 250)
 
         self._create_ui()
         self._connect_signals()
@@ -84,8 +83,7 @@ class DHKEDialog(QDialog):
         self.key_output = QPlainTextEdit(self._model.public_key.hex(), readOnly=True)
         key_output_layout.addWidget(self.key_output)
 
-        self.copy_btn = CopyButton(self)
-        self.copy_btn.clicked.connect(self.copy_key)
+        self.copy_btn = CopyButton(self.key_output.toPlainText, self)
         self.refresh_btn = IconButton(
             QIcon.fromTheme(QIcon.ThemeIcon.ViewRefresh), "Refresh Key"
         )
@@ -111,8 +109,7 @@ class DHKEDialog(QDialog):
 
         input_layout.addWidget(self.key_input)
 
-        self.paste_btn = PasteButton(self)
-        self.paste_btn.clicked.connect(self.paste_key)
+        self.paste_btn = PasteButton(self.key_input.setPlainText, self)
 
         input_layout.addWidget(self.paste_btn)
         input_layout.setAlignment(self.paste_btn, Qt.AlignmentFlag.AlignTop)
@@ -158,16 +155,6 @@ class DHKEDialog(QDialog):
         """Enables and sets visibility of elements."""
         self.submit_btn.setEnabled(bool(self.key_input.toPlainText().strip()))
         self.error_label.setVisible(False)
-
-    @Slot()
-    def paste_key(self):
-        """Pastes the peer key from the clipboard."""
-        self.key_input.setPlainText(QApplication.clipboard().text())
-
-    @Slot()
-    def copy_key(self):
-        """Copies the public key to the clipboard."""
-        QApplication.clipboard().setText(self.key_output.toPlainText())
 
 
 class ProgressDialog(QProgressDialog):

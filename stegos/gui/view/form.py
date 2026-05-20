@@ -1,7 +1,5 @@
 import os.path
 
-import jpegio
-from PIL import Image
 from PySide6.QtCore import Qt, Slot, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
@@ -18,7 +16,9 @@ from PySide6.QtWidgets import (
     QMessageBox,
 )
 
-from stegos.core.service import LSBSteganographyService
+from stegos.core.image import Image
+from stegos.core.service import LSBSteganographyService, ExtractedItem
+from stegos.gui.controller.filesystem import IOController
 from stegos.gui.model.steganography import (
     SteganographyModel,
     EmbeddingModel,
@@ -47,6 +47,7 @@ class SteganographyForm(QWidget):
         self._model = model
         self._service = service
 
+        self._io_controller = IOController(self)
         self._progress_dialog = None
 
     @property
@@ -129,6 +130,7 @@ class EmbeddingForm(SteganographyForm):
             self._create_button("Embed"),
         ):
             layout.addWidget(widget)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def _create_input_section(self) -> QGroupBox:
         """Creates the input section for the form. Allows text or file(s) as valid inputs."""
@@ -201,10 +203,8 @@ class EmbeddingForm(SteganographyForm):
 
         Shows an overwrite, progress, and results dialog.
         """
-        if os.path.isfile(self._model.output):
-            res = OverwriteMessageBox(self._model.output, self).exec()
-            if res == QMessageBox.StandardButton.No:
-                return
+        if not self._io_controller.confirm_overwrite(self._model.output):
+            return
         worker = WorkerExecutor.run(
             self.service.embed,
             self._model.image,
@@ -219,13 +219,10 @@ class EmbeddingForm(SteganographyForm):
             lambda e: EmbeddingMessageBoxFactory.create(e, self).exec()
         )
 
-    @Slot()
-    def _handle_embedding_result(self, embedded):
+    @Slot(Image)
+    def _handle_embedding_result(self, embedded: Image):
         """Saves and opens the stego image."""
-        if isinstance(embedded, Image.Image):
-            embedded.save(self._model.output)
-        else:
-            jpegio.write(embedded, self._model.output)
+        embedded.save(self._model.output)
         QDesktopServices.openUrl(QUrl.fromLocalFile(self._model.output))
 
 
@@ -275,21 +272,23 @@ class ExtractionForm(SteganographyForm):
             lambda e: ExtractionMessageBoxFactory.create(e, self).exec()
         )
 
-    @Slot()
-    def _handle_extraction(self, extracted):
+    @Slot(ExtractedItem)
+    def _handle_extraction(self, extracted: ExtractedItem):
         """Saves and shows dialogs for the extracted files/bytes."""
-        name, content = extracted[0], extracted[1]
-        if name == "output":
-            TextDialog(
-                "Extracted Message",
-                "The following message was extracted:",
-                content.decode(),
-            ).exec()
-        else:
-            with open(f"{self.model.output}{name}", "wb") as file:
-                file.write(content)
+        if extracted.is_file:
             QMessageBox.information(
                 self,
                 "Extracted File",
-                f"The following file was extracted:<br><br>'{name}'",
+                f"The following file was extracted:<br><br>'{extracted.name}'",
             )
+            output = self.model.output / extracted.name
+            if not self._io_controller.confirm_overwrite(output):
+                return
+            with open(output, "wb") as file:
+                file.write(extracted.content)
+        else:
+            TextDialog(
+                "Extracted Message",
+                "The following message was extracted:",
+                extracted.content.decode(),
+            ).exec()

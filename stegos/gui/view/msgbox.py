@@ -3,6 +3,7 @@ from abc import abstractmethod
 from PySide6.QtWidgets import QMessageBox, QWidget
 from cryptography.fernet import InvalidToken
 
+from stegos.core.exception import UnsupportedImageFormatException
 from stegos.core.steganography.exception import (
     InsufficientCapacityException,
     InvalidCoverImageException,
@@ -79,6 +80,8 @@ class EmbeddingMessageBoxFactory(ExceptionMessageBoxFactory):
                     "Selected image is too small.",
                     "Choose a larger image.",
                 )
+            case UnsupportedImageFormatException():
+                text = "Selected image format is not supported."
         return QMessageBox(
             QMessageBox.Icon.Critical,
             "Embedding Error",
@@ -100,6 +103,8 @@ class ExtractionMessageBoxFactory(ExceptionMessageBoxFactory):
                     "Embedded data could not be extracted.",
                     "Selected image may not contain embedded data, or the password may be incorrect.",
                 )
+            case UnsupportedImageFormatException():
+                text = "Selected image format is not supported."
         return QMessageBox(
             QMessageBox.Icon.Critical,
             "Extraction Error",

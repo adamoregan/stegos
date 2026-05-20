@@ -21,11 +21,9 @@ class FileSystemDropList(QListWidget):
         :param tooltip: Tooltip of the list.
         """
         super().__init__()
-
         self.setToolTip(tooltip)
-
-        self.drop_handler = FileSystemDropHandler(self)
-        self.drop_handler.itemsDropped.connect(self.addItems)
+        self._drop_handler = FileSystemDropHandler(self)
+        self._drop_handler.itemsDropped.connect(self.addItems)
 
 
 class FileSystemLineEdit(QLineEdit):
@@ -37,8 +35,8 @@ class FileSystemLineEdit(QLineEdit):
         :param placeholderText: Placeholder text for the input.
         """
         super().__init__(placeholderText=placeholderText)
-        self.drop_handler = FileSystemDropHandler(self)
-        self.drop_handler.itemsDropped.connect(lambda items: self.setText(items[0]))
+        self._drop_handler = FileSystemDropHandler(self)
+        self._drop_handler.itemsDropped.connect(lambda items: self.setText(items[0]))
 
 
 class FileSystemInput(QWidget):
@@ -54,7 +52,7 @@ class FileSystemInput(QWidget):
         """Creates an instance of FileSystemInput."""
         super().__init__()
 
-        self.dialog = QFileDialog(fileMode=mode)
+        self._dialog = QFileDialog(fileMode=mode)
 
         layout = QHBoxLayout(self)
 
@@ -74,8 +72,8 @@ class FileSystemInput(QWidget):
 
         Populates the input if a file or directory is selected.
         """
-        if self.dialog.exec():
-            items = self.dialog.selectedFiles()
+        if self._dialog.exec():
+            items = self._dialog.selectedFiles()
             if items:
                 self.input.setText(items[0])
 
@@ -124,8 +122,9 @@ class MultiFileInput(QWidget):
         self.clear_button.clicked.connect(self.file_list.clear)
 
         self.file_list.itemSelectionChanged.connect(self._toggle_update_button)
-        self.file_list.model().rowsInserted.connect(self._toggle_clear_button)
-        self.file_list.model().rowsRemoved.connect(self._toggle_clear_button)
+        model = self.file_list.model()
+        for signal in (model.rowsInserted, model.rowsRemoved, model.modelReset):
+            signal.connect(self._toggle_clear_button)
 
     @Slot()
     def _toggle_update_button(self) -> None:

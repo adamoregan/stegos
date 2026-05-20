@@ -33,11 +33,13 @@ class MixedFormat(StrEnum):
         """
         compression = image.info.get("compression", "")
         if LossyFormat.JPEG in compression:
+            print(ImageCompressionType.LOSSY)
             return ImageCompressionType.LOSSY
+        print(ImageCompressionType.LOSSLESS)
         return ImageCompressionType.LOSSLESS
 
 
-def get_compression_type(image: Image) -> ImageCompressionType:
+def compression_type(image: Image) -> ImageCompressionType:
     """
     Gets the compression type of an image.
     :param image: Image to get the compression type of.
