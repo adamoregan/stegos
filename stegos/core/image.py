@@ -28,4 +28,4 @@ class JPEGImage(Image):
         self._image = image
 
     def save(self, path: str | Path) -> None:
-        jio.write(self._image, path)
+        jio.write(self._image, str(path))

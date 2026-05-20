@@ -68,7 +68,7 @@ class LSBSteganographyService:
         )
         compressed = self._compress_payload(payload)
         if comp_type == ImageCompressionType.LOSSY:
-            image = jio.read(cover_image)
+            image = jio.read(str(cover_image))
             strategy.embed(image.coef_arrays[0], compressed)
             return JPEGImage(image)
         img_arr = np.array(image)
@@ -91,7 +91,7 @@ class LSBSteganographyService:
             SteganographyStrategyBuilder(comp_type, image).encryption(password).build()
         )
         if comp_type == ImageCompressionType.LOSSY:
-            image = jio.read(stego_image).coef_arrays[0]
+            image = jio.read(str(stego_image)).coef_arrays[0]
         extracted = strategy.extract(np.array(image))
         if zipfile.is_zipfile(io.BytesIO(extracted)):
             for name, content in self._file_compressor.decompress(extracted):
