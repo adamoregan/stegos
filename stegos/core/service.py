@@ -59,7 +59,7 @@ class LSBSteganographyService:
         :param cover_image: Cover image used as the carrier of the payload.
         :param payload: Payload to embed inside the cover image. Should be bytes or a list of file paths.
         :param password: Password used to encrypt the payload. A key is derived from the password.
-        :return:
+        :return: Image with the embedded payload.
         """
         image = PILImage.open(cover_image)
         comp_type = compression_type(image)
@@ -83,8 +83,7 @@ class LSBSteganographyService:
 
         :param stego_image: Stego image that contains a hidden payload.
         :param password: Password used to decrypt the payload. A key is derived from the password.
-        :return: If the payload is an archive, returns the names and contents of each file. Otherwise, returns "output"
-        and the embedded bytes.
+        :return: Yields extracted items which can be files or bytes.
         """
         image = PILImage.open(stego_image)
         comp_type = compression_type(image)

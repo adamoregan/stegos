@@ -1,5 +1,3 @@
-import os.path
-
 from PySide6.QtCore import Qt, Slot, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
@@ -29,7 +27,6 @@ from stegos.gui.view.dialog import ProgressDialog, TextDialog
 from stegos.gui.view.filesystem import FileSystemInput, MultiFileInput
 from stegos.gui.view.input import PasswordInput
 from stegos.gui.view.msgbox import (
-    OverwriteMessageBox,
     EmbeddingMessageBoxFactory,
     ExtractionMessageBoxFactory,
 )
@@ -167,17 +164,20 @@ class EmbeddingForm(SteganographyForm):
     @Slot()
     def _update_payload_from_mode(self) -> None:
         """Updates the payload of the model depending on the current input mode."""
-        current = self.input_stack.currentWidget()
-        match current:
+        match self.input_stack.currentWidget():
             case self.text_edit:
                 self._update_text_payload()
             case self.file_form:
                 self._update_file_payload()
 
+    @Slot()
     def _update_text_payload(self) -> None:
+        """Updates the text payload for embedding."""
         self._model.set_payload(self.text_edit.toPlainText().encode())
 
+    @Slot()
     def _update_file_payload(self) -> None:
+        """Updates the file(s) payload for embedding."""
         files = [
             self.file_form.file_list.item(file).text()
             for file in range(self.file_form.file_list.count())
@@ -194,6 +194,7 @@ class EmbeddingForm(SteganographyForm):
         self.text_edit.textChanged.connect(self._update_text_payload)
         self.file_form.file_list.model().rowsInserted.connect(self._update_file_payload)
         self.file_form.file_list.model().rowsRemoved.connect(self._update_file_payload)
+        self.file_form.file_list.model().modelReset.connect(self._update_file_payload)
 
         self.button.clicked.connect(self.embed)
 

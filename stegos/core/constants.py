@@ -33,9 +33,7 @@ class MixedFormat(StrEnum):
         """
         compression = image.info.get("compression", "")
         if LossyFormat.JPEG in compression:
-            print(ImageCompressionType.LOSSY)
             return ImageCompressionType.LOSSY
-        print(ImageCompressionType.LOSSLESS)
         return ImageCompressionType.LOSSLESS
 
 

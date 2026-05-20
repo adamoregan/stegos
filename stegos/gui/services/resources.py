@@ -6,6 +6,8 @@ from stegos.gui.util import read_resource
 
 
 class StyleSheetBuilder:
+    """Builder for application stylesheets based on OS theme."""
+
     def __init__(self, scheme: Qt.ColorScheme):
         self._base = read_resource(Stylesheets.BASE)
         self._color_scheme = scheme
@@ -29,6 +31,8 @@ class StyleSheetBuilder:
 
 
 class StyleSheetService(QObject):
+    """Service for creating and loading the correct stylesheets depending on current OS theme."""
+
     def __init__(self, app: QApplication = None):
         super().__init__()
         self._app = app or QApplication.instance()
